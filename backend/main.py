@@ -2,6 +2,7 @@ import os
 import uuid
 from typing import List
 from fastapi import FastAPI, HTTPException, status
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 import boto3
 from botocore.exceptions import BotoCoreError, ClientError
@@ -10,6 +11,14 @@ app = FastAPI(
     title="FilaFlow API",
     description="API para gerenciamento e controle do inventário de filamentos 3D",
     version="1.0.0"
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Configuração do DynamoDB
