@@ -1,4 +1,4 @@
-name: Deploy Infrastructure with Terraform
+name: FilaFlow CI/CD Pipeline
 
 # Gatilhos de execução do Workflow
 on:
@@ -7,6 +7,8 @@ on:
       - main
     paths:
       - 'terraform/**'
+      - 'backend/**'
+      - '.github/workflows/**'
   # Permite a execução manual através da aba Actions no GitHub UI
   workflow_dispatch:
 
@@ -45,7 +47,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      # Step 4: Inicializar o backend remotos (S3) e carregar módulos/providers
+      # Step 4: Inicializar o backend remoto (S3) e carregar módulos/providers
       - name: Terraform Init
         run: terraform init
 
@@ -53,7 +55,7 @@ jobs:
       - name: Terraform Plan
         run: terraform plan -out=tfplan
 
-      # Step 6: Fazer o upload do artefato contendo o plano de execução para ser reutilizado no Job de Apply
+      # Step 6: Fazer o upload do artefato contendo o plano de execução
       - name: Upload Terraform Plan Artifact
         uses: actions/upload-artifact@v4
         with:
@@ -133,7 +135,7 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      # Step 4, 5 & 6: Build da imagem Docker com as tags latest e commit SHA e Push para o ECR
+      # Step 4: Build, Tag e Push da imagem Docker para o ECR
       - name: Build, Tag, and Push Backend Image to ECR
         env:
           ECR_REPOSITORY: 274622205752.dkr.ecr.us-east-1.amazonaws.com/filaflow-backend
@@ -142,4 +144,3 @@ jobs:
           docker build -t $ECR_REPOSITORY:latest -t $ECR_REPOSITORY:$IMAGE_TAG ./backend
           docker push $ECR_REPOSITORY:latest
           docker push $ECR_REPOSITORY:$IMAGE_TAG
-
