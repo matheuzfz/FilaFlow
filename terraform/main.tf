@@ -35,14 +35,6 @@ provider "aws" {
 
 # ==============================================================================
 # 1. Rede (VPC, Subnets Públicas e Internet Gateway)
-# ==============================================================================
-
-resource "aws_route" "internet_access" {
-  route_table_id         = aws_route_table.public.id
-  destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = aws_internet_gateway.main.id
-}
-
 # VPC simples para abrigar a infraestrutura do FilaFlow
 resource "aws_vpc" "main" {
   cidr_block           = "10.0.0.0/16"
