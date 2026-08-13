@@ -1,0 +1,109 @@
+name: Deploy Infrastructure with Terraform
+
+# Gatilhos de execução do Workflow
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'terraform/**'
+  # Permite a execução manual através da aba Actions no GitHub UI
+  workflow_dispatch:
+
+# Permissões necessárias para leitura do código e autenticação AWS via OIDC/Secrets
+permissions:
+  contents: read
+
+jobs:
+  # ============================================================================
+  # 1. Job: Terraform Plan
+  # ============================================================================
+  terraform-plan:
+    name: 'Terraform Plan'
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./terraform
+
+    steps:
+      # Step 1: Fazer checkout do código-fonte do repositório
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # Step 2: Configurar o executável do Terraform
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: '1.7.0'
+
+      # Step 3: Autenticar na AWS usando os secrets configurados
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      # Step 4: Inicializar o backend remotos (S3) e carregar módulos/providers
+      - name: Terraform Init
+        run: terraform init
+
+      # Step 5: Gerar o plano de execução e salvar no arquivo 'tfplan'
+      - name: Terraform Plan
+        run: terraform plan -out=tfplan
+
+      # Step 6: Fazer o upload do artefato contendo o plano de execução para ser reutilizado no Job de Apply
+      - name: Upload Terraform Plan Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tfplan
+          path: terraform/tfplan
+          retention-days: 1
+
+  # ============================================================================
+  # 2. Job: Terraform Apply
+  # ============================================================================
+  terraform-apply:
+    name: 'Terraform Apply'
+    needs: terraform-plan
+    environment: aws-production-infra
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./terraform
+
+    steps:
+      # Step 1: Fazer checkout do código-fonte
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # Step 2: Configurar o executável do Terraform
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: '1.7.0'
+
+      # Step 3: Baixar o artefato do plano gerado no Job anterior
+      - name: Download Terraform Plan Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: tfplan
+          path: terraform
+
+      # Step 4: Autenticar na AWS
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      # Step 5: Inicializar o Terraform
+      - name: Terraform Init
+        run: terraform init
+
+      # Step 6: Aplicar as mudanças salvas no plano aprovado
+      - name: Terraform Apply
+        run: terraform apply -auto-approve tfplan
