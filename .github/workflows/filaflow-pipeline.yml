@@ -18,10 +18,35 @@ permissions:
 
 jobs:
   # ============================================================================
-  # 1. Job: Terraform Plan
+  # 1. Job: Detect Changes (dorny/paths-filter)
+  # ============================================================================
+  changes:
+    name: 'Detect Folder Changes'
+    runs-on: ubuntu-latest
+    outputs:
+      terraform: ${{ steps.filter.outputs.terraform }}
+      backend: ${{ steps.filter.outputs.backend }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Check for file changes
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            terraform:
+              - 'terraform/**'
+            backend:
+              - 'backend/**'
+
+  # ============================================================================
+  # 2. Job: Terraform Plan
   # ============================================================================
   terraform-plan:
     name: 'Terraform Plan'
+    needs: changes
+    if: ${{ needs.changes.outputs.terraform == 'true' }}
     runs-on: ubuntu-latest
 
     defaults:
@@ -64,7 +89,7 @@ jobs:
           retention-days: 1
 
   # ============================================================================
-  # 2. Job: Terraform Apply
+  # 3. Job: Terraform Apply
   # ============================================================================
   terraform-apply:
     name: 'Terraform Apply'
@@ -111,10 +136,12 @@ jobs:
         run: terraform apply -auto-approve tfplan
 
   # ============================================================================
-  # 3. Job: Build and Push Backend Image to Amazon ECR
+  # 4. Job: Build and Push Backend Image to Amazon ECR
   # ============================================================================
   build-and-push-backend:
     name: 'Build and Push Backend'
+    needs: changes
+    if: ${{ needs.changes.outputs.backend == 'true' }}
     runs-on: ubuntu-latest
 
     steps:
