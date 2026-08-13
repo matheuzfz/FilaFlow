@@ -107,3 +107,39 @@ jobs:
       # Step 6: Aplicar as mudanças salvas no plano aprovado
       - name: Terraform Apply
         run: terraform apply -auto-approve tfplan
+
+  # ============================================================================
+  # 3. Job: Build and Push Backend Image to Amazon ECR
+  # ============================================================================
+  build-and-push-backend:
+    name: 'Build and Push Backend'
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout do código do repositório
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # Step 2: Configurar as credenciais da AWS
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      # Step 3: Autenticação/Login no Amazon ECR
+      - name: Log in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      # Step 4, 5 & 6: Build da imagem Docker com as tags latest e commit SHA e Push para o ECR
+      - name: Build, Tag, and Push Backend Image to ECR
+        env:
+          ECR_REPOSITORY: 274622205752.dkr.ecr.us-east-1.amazonaws.com/filaflow-backend
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REPOSITORY:latest -t $ECR_REPOSITORY:$IMAGE_TAG ./backend
+          docker push $ECR_REPOSITORY:latest
+          docker push $ECR_REPOSITORY:$IMAGE_TAG
+
