@@ -8,6 +8,7 @@ on:
     paths:
       - 'terraform/**'
       - 'backend/**'
+      - 'frontend/**'
       - '.github/workflows/**'
   # Permite a execução manual através da aba Actions no GitHub UI
   workflow_dispatch:
@@ -26,6 +27,7 @@ jobs:
     outputs:
       terraform: ${{ steps.filter.outputs.terraform }}
       backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -39,6 +41,8 @@ jobs:
               - 'terraform/**'
             backend:
               - 'backend/**'
+            frontend:
+              - 'frontend/**'
 
   # ============================================================================
   # 2. Job: Terraform Plan
@@ -162,12 +166,49 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      # Step 4: Build, Tag e Push da imagem Docker para o ECR
+      # Step 4: Build, Tag e Push da imagem Docker do Backend para o ECR
       - name: Build, Tag, and Push Backend Image to ECR
         env:
           ECR_REPOSITORY: 274622205752.dkr.ecr.us-east-1.amazonaws.com/filaflow-backend
           IMAGE_TAG: ${{ github.sha }}
         run: |
           docker build -t $ECR_REPOSITORY:latest -t $ECR_REPOSITORY:$IMAGE_TAG ./backend
+          docker push $ECR_REPOSITORY:latest
+          docker push $ECR_REPOSITORY:$IMAGE_TAG
+
+  # ============================================================================
+  # 5. Job: Build and Push Frontend Image to Amazon ECR
+  # ============================================================================
+  build-and-push-frontend:
+    name: 'Build and Push Frontend'
+    needs: changes
+    if: ${{ needs.changes.outputs.frontend == 'true' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout do código do repositório
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # Step 2: Configurar as credenciais da AWS
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      # Step 3: Autenticação/Login no Amazon ECR
+      - name: Log in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      # Step 4: Build, Tag e Push da imagem Docker do Frontend para o ECR
+      - name: Build, Tag, and Push Frontend Image to ECR
+        env:
+          ECR_REPOSITORY: 274622205752.dkr.ecr.us-east-1.amazonaws.com/filaflow-frontend
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REPOSITORY:latest -t $ECR_REPOSITORY:$IMAGE_TAG ./frontend
           docker push $ECR_REPOSITORY:latest
           docker push $ECR_REPOSITORY:$IMAGE_TAG
