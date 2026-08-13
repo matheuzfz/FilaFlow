@@ -11,18 +11,6 @@ on:
       - 'frontend/**'
       - '.github/workflows/**'
 
-  # Permite a execução manual através da aba Actions no GitHub UI com escolha de release SemVer
-  workflow_dispatch:
-    inputs:
-      release_type:
-        description: 'Tipo de Release (SemVer)'
-        required: true
-        type: choice
-        options:
-          - patch
-          - minor
-          - major
-
 # Permissões necessárias para leitura do código e autenticação AWS via OIDC/Secrets
 permissions:
   contents: read
@@ -60,7 +48,7 @@ jobs:
   test-backend:
     name: 'Test Backend'
     needs: changes
-    if: ${{ needs.changes.outputs.backend == 'true' || github.event_name == 'workflow_dispatch' }}
+    if: ${{ needs.changes.outputs.backend == 'true' }}
     runs-on: ubuntu-latest
 
     defaults:
@@ -90,7 +78,7 @@ jobs:
   test-frontend:
     name: 'Test Frontend'
     needs: changes
-    if: ${{ needs.changes.outputs.frontend == 'true' || github.event_name == 'workflow_dispatch' }}
+    if: ${{ needs.changes.outputs.frontend == 'true' }}
     runs-on: ubuntu-latest
 
     defaults:
@@ -213,7 +201,7 @@ jobs:
   build-and-push-backend:
     name: 'Build and Push Backend'
     needs: [changes, test-backend]
-    if: ${{ needs.changes.outputs.backend == 'true' || github.event_name == 'workflow_dispatch' }}
+    if: ${{ needs.changes.outputs.backend == 'true' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -221,13 +209,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # Step 2: Log de Release (Se disparado via workflow_dispatch)
-      - name: Log Release Information
-        run: |
-          echo "Disparo manual via workflow_dispatch detectado."
-          echo "Tipo de Release selecionado (SemVer): ${{ github.event.inputs.release_type || 'N/A (Push Automático)' }}"
-
-      # Step 3: Configurar as credenciais da AWS
+      # Step 2: Configurar as credenciais da AWS
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -235,12 +217,12 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      # Step 4: Autenticação/Login no Amazon ECR
+      # Step 3: Autenticação/Login no Amazon ECR
       - name: Log in to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      # Step 5: Build, Tag e Push da imagem Docker do Backend para o ECR
+      # Step 4: Build, Tag e Push da imagem Docker do Backend para o ECR
       - name: Build, Tag, and Push Backend Image to ECR
         env:
           ECR_REPOSITORY: 274622205752.dkr.ecr.us-east-1.amazonaws.com/filaflow-backend
@@ -256,7 +238,7 @@ jobs:
   build-and-push-frontend:
     name: 'Build and Push Frontend'
     needs: [changes, test-frontend]
-    if: ${{ needs.changes.outputs.frontend == 'true' || github.event_name == 'workflow_dispatch' }}
+    if: ${{ needs.changes.outputs.frontend == 'true' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -264,13 +246,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # Step 2: Log de Release (Se disparado via workflow_dispatch)
-      - name: Log Release Information
-        run: |
-          echo "Disparo manual via workflow_dispatch detectado."
-          echo "Tipo de Release selecionado (SemVer): ${{ github.event.inputs.release_type || 'N/A (Push Automático)' }}"
-
-      # Step 3: Configurar as credenciais da AWS
+      # Step 2: Configurar as credenciais da AWS
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -278,12 +254,12 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      # Step 4: Autenticação/Login no Amazon ECR
+      # Step 3: Autenticação/Login no Amazon ECR
       - name: Log in to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      # Step 5: Build, Tag e Push da imagem Docker do Frontend para o ECR
+      # Step 4: Build, Tag e Push da imagem Docker do Frontend para o ECR
       - name: Build, Tag, and Push Frontend Image to ECR
         env:
           ECR_REPOSITORY: 274622205752.dkr.ecr.us-east-1.amazonaws.com/filaflow-frontend
