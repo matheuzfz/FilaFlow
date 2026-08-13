@@ -9,6 +9,9 @@ RUN npm install
 
 COPY . .
 
+ARG VITE_API_URL=http://34.238.239.42:8000
+ENV VITE_API_URL=$VITE_API_URL
+
 RUN npm run build
 
 # Estágio 2: Servidor Nginx de Produção
