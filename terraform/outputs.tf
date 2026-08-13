@@ -57,12 +57,12 @@ output "ecs_task_execution_role_arn" {
 }
 
 # Outputs dos Serviços ECS
-output "ecs_backend_service_name" {
+output "backend_service_name" {
   description = "Nome do serviço ECS para o Backend."
   value       = aws_ecs_service.backend.name
 }
 
-output "ecs_frontend_service_name" {
+output "frontend_service_name" {
   description = "Nome do serviço ECS para o Frontend."
   value       = aws_ecs_service.frontend.name
 }
