@@ -5,14 +5,6 @@ Todas as alterações notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
-## [1.0.1] - 2026-08-12
-
-### Added
-- Adicionada configuração de `CORSMiddleware` na API FastAPI permitindo todas as origens para suportar requisições cross-origin do frontend.
-
-### Changed
-- Atualizada a URL base da API no frontend para apontar para o IP de produção do backend no Amazon ECS (`http://34.231.229.142:8000`).
-
 ## [1.0.0] - 2026-08-12
 
 ### Added
