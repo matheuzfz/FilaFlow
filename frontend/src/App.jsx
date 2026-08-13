@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Layers, PlusCircle, Package, RefreshCw, AlertCircle } from 'lucide-react';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_URL = import.meta.env.VITE_API_URL || 'http://34.231.229.142:8000';
 
 export default function App() {
   const [filamentos, setFilamentos] = useState([]);
