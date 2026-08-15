@@ -1,4 +1,4 @@
-![CI/CD Status](https://github.com/matheuzfz/FilaFlow/actions/workflows/main.yml/badge.svg)
+![CI/CD Status](https://github.com/matheuzfz/FilaFlow/actions/workflows/filaflow-pipeline.yml/badge.svg)
 
 # FilaFlow - Gerenciamento Inteligente de Filamentos 3D
 

@@ -1,0 +1,43 @@
+<svg width="700" height="400" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="#1a1a1a" rx="15" />
+  
+  <!-- Title -->
+  <text x="350" y="40" font-family="Arial, sans-serif" font-size="22" font-weight="bold" fill="#ffffff" text-anchor="middle">Arquitetura FilaFlow</text>
+
+  <!-- AWS Cloud Boundary -->
+  <rect x="50" y="70" width="600" height="300" fill="#232f3e" rx="10" stroke="#ff9900" stroke-width="2" stroke-dasharray="8,4" />
+  <text x="70" y="100" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#ff9900">AWS Cloud</text>
+
+  <!-- ECS Fargate Boundary -->
+  <rect x="80" y="120" width="380" height="230" fill="#2c3b4d" rx="8" stroke="#00a4a6" stroke-width="2" />
+  <text x="95" y="145" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#00a4a6">Amazon ECS (Fargate)</text>
+
+  <!-- Frontend Container -->
+  <rect x="110" y="180" width="140" height="60" rx="6" fill="#61dafb" />
+  <text x="180" y="210" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#20232a" text-anchor="middle">Frontend</text>
+  <text x="180" y="225" font-family="Arial, sans-serif" font-size="11" fill="#20232a" text-anchor="middle">(React / Vite)</text>
+
+  <!-- Backend Container -->
+  <rect x="290" y="180" width="140" height="60" rx="6" fill="#009688" />
+  <text x="360" y="210" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#ffffff" text-anchor="middle">Backend API</text>
+  <text x="360" y="225" font-family="Arial, sans-serif" font-size="11" fill="#ffffff" text-anchor="middle">(FastAPI / Python)</text>
+
+  <!-- DynamoDB Node -->
+  <rect x="480" y="180" width="140" height="60" rx="6" fill="#4053d6" />
+  <text x="550" y="210" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#ffffff" text-anchor="middle">Banco de Dados</text>
+  <text x="550" y="225" font-family="Arial, sans-serif" font-size="11" fill="#ffffff" text-anchor="middle">(DynamoDB)</text>
+
+  <!-- Arrows -->
+  <path d="M 250 210 L 280 210" fill="none" stroke="#ffffff" stroke-width="3" marker-end="url(#arrow)" />
+  <text x="270" y="200" font-family="Arial, sans-serif" font-size="11" fill="#ffffff" text-anchor="middle">REST</text>
+
+  <path d="M 430 210 L 470 210" fill="none" stroke="#ffffff" stroke-width="3" marker-end="url(#arrow)" />
+  <text x="450" y="200" font-family="Arial, sans-serif" font-size="11" fill="#ffffff" text-anchor="middle">NoSQL</text>
+
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#ffffff" />
+    </marker>
+  </defs>
+</svg>
