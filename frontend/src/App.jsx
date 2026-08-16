@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Layers, PlusCircle, Package, RefreshCw, AlertCircle } from 'lucide-react';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://34.238.239.42:8000';
+const API_URL = 'http://34.238.239.42:8000/filamentos';
 
 export default function App() {
   const [filamentos, setFilamentos] = useState([]);
@@ -20,7 +20,7 @@ export default function App() {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`${API_URL}/filamentos`);
+      const response = await fetch(API_URL);
       if (!response.ok) {
         throw new Error(`Erro na requisição: ${response.statusText}`);
       }
@@ -55,7 +55,7 @@ export default function App() {
     };
 
     try {
-      const response = await fetch(`${API_URL}/filamentos`, {
+      const response = await fetch(API_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -192,7 +192,7 @@ export default function App() {
                 ) : (
                   <>
                     <PlusCircle className="w-5 h-5" />
-                    <span>Salvar</span>
+                    <span>Salvar Filamento</span>
                   </>
                 )}
               </button>
