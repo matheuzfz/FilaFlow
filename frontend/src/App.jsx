@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Layers, PlusCircle, Package, RefreshCw, AlertCircle } from 'lucide-react';
 
-const API_URL = 'http://44.215.122.202:8000/filamentos';
+const API_URL = 'http://44.204.183.5:8000/filamentos';
 
 export default function App() {
   const [filamentos, setFilamentos] = useState([]);
