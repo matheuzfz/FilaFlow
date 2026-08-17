@@ -13,6 +13,7 @@ app = FastAPI(
     version="1.0.0"
 )
 
+# Configuração do Middleware de CORS para aceitar requisições de qualquer IP do frontend
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
